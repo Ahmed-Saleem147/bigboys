@@ -26,7 +26,7 @@
   body {
     font-family: 'Cormorant Garamond', serif;
     background: var(--off-white);
-    background-color: #25D366;
+    background-color: #0d0508;
     color: var(--dark);
     overflow-x: hidden;
   }
@@ -886,6 +886,23 @@
 </style>
 </head>
 <body>
+<script>
+  function closeMobile() {
+    document.getElementById('hamburger').classList.remove('open');
+    document.getElementById('mobileMenu').classList.remove('open');
+  }
+  function toggleMenu() {
+    document.getElementById('hamburger').classList.toggle('open');
+    document.getElementById('mobileMenu').classList.toggle('open');
+  }
+  document.addEventListener('click', function(e) {
+    const menu = document.getElementById('mobileMenu');
+    const burger = document.getElementById('hamburger');
+    if (menu && burger && !menu.contains(e.target) && !burger.contains(e.target)) {
+      closeMobile();
+    }
+  });
+</script>
 
 <!-- NAVBAR -->
 <nav class="navbar" id="navbar">
@@ -904,7 +921,7 @@
     <li><a href="https://wa.me/233557490950" target="_blank" class="nav-cta">Order Now</a></li>
   </ul>
 
-  <button class="nav-hamburger" id="hamburger" aria-label="Menu">
+  <button class="nav-hamburger" id="hamburger" aria-label="Menu" onclick="toggleMenu()">
     <span></span><span></span><span></span>
   </button>
 </nav>
@@ -917,7 +934,7 @@
   <a href="#shop" onclick="closeMobile()">Shop</a>
   <a href="#payment" onclick="closeMobile()">Payments</a>
   <a href="#contact" onclick="closeMobile()">Find Us</a>
-  <a href="https://wa.me/233557490950" target="_blank">🛒 Order on WhatsApp</a>
+  <a href="https://wa.me/233557490950" target="_blank" onclick="closeMobile()" style="color:#25D366; font-weight:700;">🛒 Order on WhatsApp</a>
 </div>
 
 
@@ -1654,18 +1671,7 @@ const DRINKS = [
     navbar.classList.toggle('scrolled', window.scrollY > 40);
   });
 
-  // Hamburger toggle
-  const hamburger = document.getElementById('hamburger');
-  const mobileMenu = document.getElementById('mobileMenu');
-  hamburger.addEventListener('click', () => {
-    hamburger.classList.toggle('open');
-    mobileMenu.classList.toggle('open');
-  });
 
-  function closeMobile() {
-    hamburger.classList.remove('open');
-    mobileMenu.classList.remove('open');
-  }
 </script>
 </body>
 </html>
