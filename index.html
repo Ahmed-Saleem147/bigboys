@@ -1109,6 +1109,288 @@
 
 <!-- CONTACT -->
 <div style="position:relative; background: url('https://images.unsplash.com/photo-1470337458703-46ad1756a187?w=1800&q=85&fit=crop') center/cover no-repeat; background-attachment:fixed;">
+
+
+<!-- FOOTER -->
+
+<!-- ── CART SECTION ── -->
+<section id="shop" style="background:#0d0508; padding:5rem 1.5rem;">
+  <div style="max-width:800px; margin:0 auto;">
+    <span class="section-label" style="color:var(--gold);">Browse & Order</span>
+    <h2 class="section-title" style="color:var(--white); text-shadow:0 2px 20px rgba(0,0,0,0.8); margin-bottom:0.5rem;">Build Your Order</h2>
+    <p class="section-body" style="color:rgba(255,255,255,0.75); margin-bottom:2.5rem;">Open a category, select your drinks, choose singles or cartons — then send your order.</p>
+
+    <!-- Accordion Categories -->
+    <div id="accordion" style="display:flex; flex-direction:column; gap:1rem; margin-bottom:3rem;"></div>
+
+    <!-- Cart Summary -->
+    <div id="cartSummary" style="display:none; background:rgba(212,168,67,0.07); border:1px solid rgba(212,168,67,0.3); border-radius:14px; padding:2rem;">
+      <h3 style="color:var(--gold); font-family:'Playfair Display',serif; font-size:1.5rem; margin-bottom:1.25rem;">🛒 Your Order</h3>
+      <div id="cartItems"></div>
+      <div style="border-top:1px solid rgba(212,168,67,0.25); margin-top:1.25rem; padding-top:1rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;">
+        <span style="color:rgba(255,255,255,0.55); font-size:0.85rem;">Prices confirmed via WhatsApp after order</span>
+        <button onclick="sendCartToWhatsApp()" style="background:var(--gold); color:#0d0508; border:none; padding:0.85rem 2rem; border-radius:8px; font-family:'Playfair Display',serif; font-size:1rem; font-weight:700; cursor:pointer;">📲 Send Order via WhatsApp</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+.accordion-header {
+  display:flex; justify-content:space-between; align-items:center;
+  padding:1.1rem 1.5rem; border-radius:12px;
+  background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.12);
+  cursor:pointer; user-select:none; transition:0.2s;
+}
+.accordion-header:hover { border-color:rgba(212,168,67,0.5); background:rgba(212,168,67,0.07); }
+.accordion-header.open { border-color:var(--gold); background:rgba(212,168,67,0.1); border-bottom-left-radius:0; border-bottom-right-radius:0; }
+.accordion-title { color:#fff; font-family:'Playfair Display',serif; font-size:1.15rem; display:flex; align-items:center; gap:0.6rem; }
+.accordion-badge { background:rgba(212,168,67,0.2); color:var(--gold); font-size:0.75rem; padding:2px 8px; border-radius:20px; font-family:'Cormorant Garamond',serif; }
+.accordion-arrow { color:var(--gold); font-size:1.1rem; transition:transform 0.25s; }
+.accordion-arrow.open { transform:rotate(180deg); }
+.accordion-body { display:none; border:1px solid var(--gold); border-top:none; border-bottom-left-radius:12px; border-bottom-right-radius:12px; overflow:hidden; }
+.accordion-body.open { display:block; }
+.drink-row {
+  display:flex; align-items:center; gap:0.75rem; padding:0.75rem 1.25rem;
+  border-bottom:1px solid rgba(255,255,255,0.06); flex-wrap:wrap;
+  background:rgba(0,0,0,0.25);
+}
+.drink-row:last-child { border-bottom:none; }
+.drink-row:hover { background:rgba(212,168,67,0.05); }
+.drink-row-name { flex:1; color:rgba(255,255,255,0.9); font-size:0.95rem; min-width:140px; }
+.toggle-wrap { display:flex; border:1px solid rgba(212,168,67,0.3); border-radius:6px; overflow:hidden; }
+.toggle-btn { padding:0.3rem 0.75rem; background:transparent; border:none; color:rgba(255,255,255,0.5); font-family:inherit; font-size:0.8rem; cursor:pointer; transition:0.15s; }
+.toggle-btn.active { background:rgba(212,168,67,0.25); color:var(--gold); }
+.qty-ctrl { display:flex; align-items:center; gap:0.4rem; }
+.qb { width:26px; height:26px; border-radius:50%; border:1px solid rgba(212,168,67,0.4); background:transparent; color:var(--gold); font-size:1rem; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:0.15s; }
+.qb:hover { background:rgba(212,168,67,0.2); }
+.qn { color:#fff; font-size:0.9rem; min-width:20px; text-align:center; }
+.add-row-btn { padding:0.3rem 0.9rem; border-radius:6px; border:none; background:var(--gold); color:#0d0508; font-family:'Playfair Display',serif; font-weight:700; font-size:0.82rem; cursor:pointer; white-space:nowrap; transition:0.2s; }
+.add-row-btn:hover { background:var(--gold-light); }
+.add-row-btn.added { background:#2ecc71; color:#fff; }
+.cart-item { display:flex; justify-content:space-between; align-items:center; padding:0.55rem 0; border-bottom:1px solid rgba(255,255,255,0.07); gap:1rem; }
+.cart-item-name { flex:1; color:rgba(255,255,255,0.85); font-size:0.9rem; }
+.cart-item-qty { color:var(--gold); font-size:0.85rem; white-space:nowrap; }
+.rm-btn { background:none; border:none; color:rgba(255,100,100,0.6); cursor:pointer; font-size:0.95rem; padding:0.1rem 0.3rem; }
+.rm-btn:hover { color:#ff4444; }
+</style>
+
+<script>
+const DRINKS = [
+  {name:"Moet Brut", cat:"champagne"},
+  {name:"Moet Nectar Imperial", cat:"champagne"},
+  {name:"Moet Rose Imperial", cat:"champagne"},
+  {name:"Moet Nectar Rose", cat:"champagne"},
+  {name:"Moet Ice Imperial", cat:"champagne"},
+  {name:"Moet Ice Imperial Rose", cat:"champagne"},
+  {name:"Veuve Clicquot Brut", cat:"champagne"},
+  {name:"Veuve Clicquot Rich", cat:"champagne"},
+  {name:"Veuve Clicquot Rich Rose", cat:"champagne"},
+  {name:"Veuve Clicquot Rose", cat:"champagne"},
+  {name:"Laurent Perrier", cat:"champagne"},
+  {name:"Laurent Perrier Rose", cat:"champagne"},
+  {name:"Taittinger", cat:"champagne"},
+  {name:"Dom Perignon Brut", cat:"champagne"},
+  {name:"Dom Perignon Rose", cat:"champagne"},
+  {name:"Ace of Spade Gold", cat:"champagne"},
+  {name:"Ace of Spade Silver", cat:"champagne"},
+  {name:"Ace of Spade Rose", cat:"champagne"},
+  {name:"Belaire Fantom Rose", cat:"champagne"},
+  {name:"Belaire Luxe", cat:"champagne"},
+  {name:"Belaire Bleu", cat:"champagne"},
+  {name:"Belaire Rose", cat:"champagne"},
+  {name:"Belaire Gold", cat:"champagne"},
+  {name:"Canard Duchene", cat:"champagne"},
+  {name:"Duval Leroy", cat:"champagne"},
+  {name:"Monopoly", cat:"champagne"},
+  {name:"Lanson Brut", cat:"champagne"},
+  {name:"Lanson Rose", cat:"champagne"},
+  {name:"Nicolas Feuillatte", cat:"champagne"},
+  {name:"Glenfiddich 26 Years", cat:"whiskey"},
+  {name:"Glenfiddich 23 Years", cat:"whiskey"},
+  {name:"Glenfiddich 21 Years", cat:"whiskey"},
+  {name:"Glenfiddich 18 Years", cat:"whiskey"},
+  {name:"Glenfiddich 15 Years", cat:"whiskey"},
+  {name:"Glenfiddich 12 Years", cat:"whiskey"},
+  {name:"Glenfiddich Select Cask", cat:"whiskey"},
+  {name:"Macallan 12 Years", cat:"whiskey"},
+  {name:"Macallan 15 Years", cat:"whiskey"},
+  {name:"Macallan 18 Years", cat:"whiskey"},
+  {name:"Macallan Harmony", cat:"whiskey"},
+  {name:"Bushmills", cat:"whiskey"},
+  {name:"Johnnie Walker Blue Label", cat:"whiskey"},
+  {name:"Johnnie Walker Black Label", cat:"whiskey"},
+  {name:"Johnnie Walker Red Label", cat:"whiskey"},
+  {name:"Johnnie Walker Gold Label", cat:"whiskey"},
+  {name:"Johnnie Walker Gold Label 70cl", cat:"whiskey"},
+  {name:"Johnnie Walker Double Black", cat:"whiskey"},
+  {name:"Johnnie Walker 18 Years", cat:"whiskey"},
+  {name:"Johnnie Walker Island Green", cat:"whiskey"},
+  {name:"Chivas Regal 18 Years", cat:"whiskey"},
+  {name:"Chivas Extra", cat:"whiskey"},
+  {name:"Chivas Regal 12 Years", cat:"whiskey"},
+  {name:"Chivas Regal GLS Pack 70cl", cat:"whiskey"},
+  {name:"Jack Daniels Single Barrel", cat:"whiskey"},
+  {name:"Jack Daniels", cat:"whiskey"},
+  {name:"Jack Daniels Honey", cat:"whiskey"},
+  {name:"Jack Daniels Fire", cat:"whiskey"},
+  {name:"Jack Daniels Apple", cat:"whiskey"},
+  {name:"Gentleman Jack", cat:"whiskey"},
+  {name:"Ballantines 12 Years", cat:"whiskey"},
+  {name:"Aberfeldy 12 Years", cat:"whiskey"},
+  {name:"The Glenlivet Founders Reserve", cat:"whiskey"},
+  {name:"The Glenlivet 15 Years", cat:"whiskey"},
+  {name:"The Glenlivet 18 Years 70cl", cat:"whiskey"},
+  {name:"Singleton 12 Years", cat:"whiskey"},
+  {name:"Singleton 15 Years", cat:"whiskey"},
+  {name:"Monkey Shoulder", cat:"whiskey"},
+  {name:"Jameson 1 Litre", cat:"whiskey"},
+  {name:"Jameson 70cl", cat:"whiskey"},
+  {name:"Jameson Black Barrel", cat:"whiskey"},
+  {name:"Black and White", cat:"whiskey"},
+  {name:"Explorers Club Collection", cat:"whiskey"},
+  {name:"Select Cask", cat:"whiskey"},
+  {name:"Glenmorangie 10 Years", cat:"whiskey"},
+  {name:"Clan MacGregor", cat:"whiskey"},
+  {name:"Imperial Blue Swing", cat:"whiskey"},
+  {name:"Tullamore Dew", cat:"whiskey"},
+  {name:"Grants", cat:"whiskey"},
+  {name:"Hennessy XO 1 Litre", cat:"cognac"},
+  {name:"Hennessy XO 70cl", cat:"cognac"},
+  {name:"Hennessy James", cat:"cognac"},
+  {name:"Hennessy VSOP", cat:"cognac"},
+  {name:"Hennessy VS", cat:"cognac"},
+  {name:"Remy Martin 1738", cat:"cognac"},
+  {name:"Remy Martin Club", cat:"cognac"},
+  {name:"Remy Martin VSOP", cat:"cognac"},
+  {name:"Frapin XO", cat:"cognac"},
+  {name:"Camus Extra", cat:"cognac"},
+  {name:"Camus XO", cat:"cognac"},
+  {name:"Camus VSOP", cat:"cognac"},
+  {name:"Courvoisier VSOP", cat:"cognac"},
+  {name:"Courvoisier VS", cat:"cognac"},
+  {name:"Martell Blue Swift", cat:"cognac"},
+  {name:"Martell VSOP", cat:"cognac"},
+  {name:"Martell VS 70cl", cat:"cognac"},
+  {name:"St-Remy Signature", cat:"cognac"},
+  {name:"St-Remy VSOP", cat:"cognac"},
+  {name:"St-Remy VS", cat:"cognac"},
+];
+
+const CATS = [
+  {key:"champagne", label:"🥂 Champagne"},
+  {key:"whiskey",   label:"🥃 Whiskey"},
+  {key:"cognac",    label:"🍶 Cognac"},
+];
+
+let cart = [];
+let state = {}; // per drink: {qty, type}
+DRINKS.forEach((_,i) => { state[i] = {qty:1, type:"single"}; });
+
+function buildAccordion() {
+  const acc = document.getElementById("accordion");
+  acc.innerHTML = "";
+  CATS.forEach(cat => {
+    const drinks = DRINKS.map((d,i) => ({...d,i})).filter(d => d.cat === cat.key);
+    const wrapper = document.createElement("div");
+    wrapper.id = "acc-" + cat.key;
+
+    wrapper.innerHTML = `
+      <div class="accordion-header" onclick="toggleAcc('${cat.key}')">
+        <span class="accordion-title">${cat.label} <span class="accordion-badge">${drinks.length} items</span></span>
+        <span class="accordion-arrow" id="arrow-${cat.key}">▼</span>
+      </div>
+      <div class="accordion-body" id="body-${cat.key}">
+        ${drinks.map(d => `
+          <div class="drink-row" id="row-${d.i}">
+            <span class="drink-row-name">${d.name}</span>
+            <div class="toggle-wrap">
+              <button class="toggle-btn active" id="tbS-${d.i}" onclick="setT(${d.i},'single')">Single</button>
+              <button class="toggle-btn" id="tbC-${d.i}" onclick="setT(${d.i},'carton')">Carton</button>
+            </div>
+            <div class="qty-ctrl">
+              <button class="qb" onclick="chQty(${d.i},-1)">−</button>
+              <span class="qn" id="qn-${d.i}">1</span>
+              <button class="qb" onclick="chQty(${d.i},1)">+</button>
+            </div>
+            <button class="add-row-btn" id="ab-${d.i}" onclick="addToCart(${d.i})">Add</button>
+          </div>`).join("")}
+      </div>`;
+    acc.appendChild(wrapper);
+  });
+}
+
+function toggleAcc(key) {
+  const body = document.getElementById("body-"+key);
+  const arrow = document.getElementById("arrow-"+key);
+  const header = document.querySelector("#acc-"+key+" .accordion-header");
+  const isOpen = body.classList.contains("open");
+  // Close all
+  document.querySelectorAll(".accordion-body").forEach(b => b.classList.remove("open"));
+  document.querySelectorAll(".accordion-arrow").forEach(a => a.classList.remove("open"));
+  document.querySelectorAll(".accordion-header").forEach(h => h.classList.remove("open"));
+  if (!isOpen) {
+    body.classList.add("open");
+    arrow.classList.add("open");
+    header.classList.add("open");
+  }
+}
+
+function setT(i, type) {
+  state[i].type = type;
+  document.getElementById("tbS-"+i).className = "toggle-btn" + (type==="single"?" active":"");
+  document.getElementById("tbC-"+i).className = "toggle-btn" + (type==="carton"?" active":"");
+  const ci = cart.findIndex(c=>c.i===i);
+  if (ci!==-1) { cart[ci].type=type; renderCart(); }
+}
+
+function chQty(i, d) {
+  state[i].qty = Math.max(1, state[i].qty + d);
+  document.getElementById("qn-"+i).textContent = state[i].qty;
+  const ci = cart.findIndex(c=>c.i===i);
+  if (ci!==-1) { cart[ci].qty=state[i].qty; renderCart(); }
+}
+
+function addToCart(i) {
+  const ci = cart.findIndex(c=>c.i===i);
+  if (ci!==-1) { cart[ci].qty=state[i].qty; cart[ci].type=state[i].type; }
+  else { cart.push({i, name:DRINKS[i].name, qty:state[i].qty, type:state[i].type}); }
+  const btn = document.getElementById("ab-"+i);
+  btn.textContent = "✓ Added"; btn.classList.add("added");
+  renderCart();
+}
+
+function removeFromCart(i) {
+  cart = cart.filter(c=>c.i!==i);
+  const btn = document.getElementById("ab-"+i);
+  if (btn) { btn.textContent="Add"; btn.classList.remove("added"); }
+  renderCart();
+}
+
+function renderCart() {
+  const summary = document.getElementById("cartSummary");
+  const items = document.getElementById("cartItems");
+  if (!cart.length) { summary.style.display="none"; return; }
+  summary.style.display="block";
+  items.innerHTML = cart.map(c =>
+    `<div class="cart-item">
+      <span class="cart-item-name">${c.name}</span>
+      <span class="cart-item-qty">${c.qty} ${c.type==="carton"?"carton(s)":"bottle(s)"}</span>
+      <button class="rm-btn" onclick="removeFromCart(${c.i})">✕</button>
+    </div>`).join("");
+}
+
+function sendCartToWhatsApp() {
+  if (!cart.length) return;
+  let msg = "Hi Big Guys! 🍾 I'd like to place an order:\n\n";
+  cart.forEach(c => { msg += "• " + c.name + " — " + c.qty + " " + (c.type==="carton"?"carton(s)":"bottle(s)") + "\n"; });
+  msg += "\nPlease confirm availability and prices. Thank you!";
+  window.open("https://wa.me/233557490950?text=" + encodeURIComponent(msg), "_blank");
+}
+
+buildAccordion();
+</script>
+
 <section class="contact" id="contact" style="background: linear-gradient(to bottom, rgba(8,3,5,0.70) 0%, rgba(100,10,20,0.55) 50%, rgba(8,3,5,0.75) 100%);">
   <div class="contact-inner">
     <span class="section-label">Get In Touch</span>
@@ -1146,41 +1428,6 @@
         <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
         Follow on Instagram
       </a>
-    </div>
-  </div>
-</section>
-
-<!-- FOOTER -->
-
-<!-- ── CART SECTION ── -->
-<section id="shop" style="background:#0d0508; padding: 5rem 1.5rem;">
-  <div style="max-width:900px; margin:0 auto;">
-    <span class="section-label" style="color:var(--gold);">Browse & Order</span>
-    <h2 class="section-title" style="color:var(--white); text-shadow:0 2px 20px rgba(0,0,0,0.8);">Build Your Order</h2>
-    <p class="section-body" style="color:rgba(255,255,255,0.8); margin-bottom:2.5rem;">Select your drinks, choose singles or cartons, set quantities — then checkout directly.</p>
-
-    <!-- Category Tabs -->
-    <div id="catTabs" style="display:flex; gap:0.75rem; flex-wrap:wrap; margin-bottom:2rem;">
-      <button onclick="filterCat('all')" class="cat-tab active-tab">All</button>
-      <button onclick="filterCat('champagne')" class="cat-tab">🥂 Champagne</button>
-      <button onclick="filterCat('whiskey')" class="cat-tab">🥃 Whiskey</button>
-      <button onclick="filterCat('cognac')" class="cat-tab">🍶 Cognac</button>
-    </div>
-
-    <!-- Search -->
-    <input type="text" id="drinkSearch" oninput="renderDrinks()" placeholder="🔍 Search drinks..." style="width:100%; padding:0.75rem 1rem; border-radius:8px; border:1px solid rgba(212,168,67,0.4); background:rgba(255,255,255,0.06); color:#fff; font-family:inherit; font-size:1rem; margin-bottom:2rem; outline:none;">
-
-    <!-- Drink Grid -->
-    <div id="drinkGrid" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:1.25rem;"></div>
-
-    <!-- Cart Summary -->
-    <div id="cartSummary" style="display:none; margin-top:3rem; background:rgba(212,168,67,0.08); border:1px solid rgba(212,168,67,0.3); border-radius:14px; padding:2rem;">
-      <h3 style="color:var(--gold); font-family:'Playfair Display',serif; font-size:1.5rem; margin-bottom:1.25rem;">🛒 Your Order</h3>
-      <div id="cartItems"></div>
-      <div style="border-top:1px solid rgba(212,168,67,0.3); margin-top:1.25rem; padding-top:1rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;">
-        <div style="color:rgba(255,255,255,0.7); font-size:0.9rem;">Prices will be confirmed via WhatsApp</div>
-        <button onclick="sendCartToWhatsApp()" style="background:var(--gold); color:#0d0508; border:none; padding:0.85rem 2rem; border-radius:8px; font-family:'Playfair Display',serif; font-size:1rem; font-weight:700; cursor:pointer; transition:0.2s;">📲 Send Order via WhatsApp</button>
-      </div>
     </div>
   </div>
 </section>
