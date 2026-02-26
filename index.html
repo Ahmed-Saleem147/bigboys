@@ -898,6 +898,7 @@
     <li><a href="#home">Home</a></li>
     <li><a href="#selection">Our Selection</a></li>
     <li><a href="#order">Order</a></li>
+    <li><a href="#shop">Shop</a></li>
     <li><a href="#payment">Payments</a></li>
     <li><a href="#contact">Find Us</a></li>
     <li><a href="https://wa.me/233557490950" target="_blank" class="nav-cta">Order Now</a></li>
@@ -913,6 +914,7 @@
   <a href="#home" onclick="closeMobile()">Home</a>
   <a href="#selection" onclick="closeMobile()">Our Selection</a>
   <a href="#order" onclick="closeMobile()">Order</a>
+  <a href="#shop" onclick="closeMobile()">Shop</a>
   <a href="#payment" onclick="closeMobile()">Payments</a>
   <a href="#contact" onclick="closeMobile()">Find Us</a>
   <a href="https://wa.me/233557490950" target="_blank">🛒 Order on WhatsApp</a>
@@ -1149,6 +1151,288 @@
 </section>
 
 <!-- FOOTER -->
+
+<!-- ── CART SECTION ── -->
+<section id="shop" style="background:#0d0508; padding: 5rem 1.5rem;">
+  <div style="max-width:900px; margin:0 auto;">
+    <span class="section-label" style="color:var(--gold);">Browse & Order</span>
+    <h2 class="section-title" style="color:var(--white); text-shadow:0 2px 20px rgba(0,0,0,0.8);">Build Your Order</h2>
+    <p class="section-body" style="color:rgba(255,255,255,0.8); margin-bottom:2.5rem;">Select your drinks, choose singles or cartons, set quantities — then checkout directly.</p>
+
+    <!-- Category Tabs -->
+    <div id="catTabs" style="display:flex; gap:0.75rem; flex-wrap:wrap; margin-bottom:2rem;">
+      <button onclick="filterCat('all')" class="cat-tab active-tab">All</button>
+      <button onclick="filterCat('champagne')" class="cat-tab">🥂 Champagne</button>
+      <button onclick="filterCat('whiskey')" class="cat-tab">🥃 Whiskey</button>
+      <button onclick="filterCat('cognac')" class="cat-tab">🍶 Cognac</button>
+    </div>
+
+    <!-- Search -->
+    <input type="text" id="drinkSearch" oninput="renderDrinks()" placeholder="🔍 Search drinks..." style="width:100%; padding:0.75rem 1rem; border-radius:8px; border:1px solid rgba(212,168,67,0.4); background:rgba(255,255,255,0.06); color:#fff; font-family:inherit; font-size:1rem; margin-bottom:2rem; outline:none;">
+
+    <!-- Drink Grid -->
+    <div id="drinkGrid" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:1.25rem;"></div>
+
+    <!-- Cart Summary -->
+    <div id="cartSummary" style="display:none; margin-top:3rem; background:rgba(212,168,67,0.08); border:1px solid rgba(212,168,67,0.3); border-radius:14px; padding:2rem;">
+      <h3 style="color:var(--gold); font-family:'Playfair Display',serif; font-size:1.5rem; margin-bottom:1.25rem;">🛒 Your Order</h3>
+      <div id="cartItems"></div>
+      <div style="border-top:1px solid rgba(212,168,67,0.3); margin-top:1.25rem; padding-top:1rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;">
+        <div style="color:rgba(255,255,255,0.7); font-size:0.9rem;">Prices will be confirmed via WhatsApp</div>
+        <button onclick="sendCartToWhatsApp()" style="background:var(--gold); color:#0d0508; border:none; padding:0.85rem 2rem; border-radius:8px; font-family:'Playfair Display',serif; font-size:1rem; font-weight:700; cursor:pointer; transition:0.2s;">📲 Send Order via WhatsApp</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+.cat-tab {
+  background: rgba(255,255,255,0.07);
+  color: rgba(255,255,255,0.7);
+  border: 1px solid rgba(255,255,255,0.15);
+  padding: 0.5rem 1.2rem;
+  border-radius: 25px;
+  cursor: pointer;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 0.95rem;
+  transition: 0.2s;
+}
+.cat-tab:hover { background: rgba(212,168,67,0.15); color: var(--gold); border-color: var(--gold); }
+.active-tab { background: var(--gold) !important; color: #0d0508 !important; border-color: var(--gold) !important; font-weight: 700; }
+.drink-card {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 12px;
+  padding: 1.25rem;
+  transition: 0.2s;
+}
+.drink-card:hover { border-color: rgba(212,168,67,0.5); background: rgba(212,168,67,0.06); }
+.drink-name { color: #fff; font-family: 'Playfair Display', serif; font-size: 1rem; margin-bottom: 0.75rem; line-height:1.3; }
+.type-toggle { display:flex; gap:0.5rem; margin-bottom:0.75rem; }
+.type-btn {
+  flex:1; padding:0.35rem 0; border-radius:6px; border:1px solid rgba(212,168,67,0.35);
+  background:transparent; color:rgba(255,255,255,0.6); cursor:pointer; font-family:inherit; font-size:0.82rem; transition:0.15s;
+}
+.type-btn.selected { background:rgba(212,168,67,0.25); color:var(--gold); border-color:var(--gold); }
+.qty-row { display:flex; align-items:center; gap:0.6rem; }
+.qty-btn { width:30px; height:30px; border-radius:50%; border:1px solid rgba(212,168,67,0.4); background:transparent; color:var(--gold); font-size:1.1rem; cursor:pointer; transition:0.15s; display:flex; align-items:center; justify-content:center; }
+.qty-btn:hover { background:rgba(212,168,67,0.2); }
+.qty-num { color:#fff; font-size:1rem; min-width:24px; text-align:center; }
+.add-btn {
+  margin-top:0.85rem; width:100%; padding:0.5rem; border-radius:8px;
+  border:none; background:var(--gold); color:#0d0508; font-family:'Playfair Display',serif;
+  font-weight:700; font-size:0.9rem; cursor:pointer; transition:0.2s;
+}
+.add-btn:hover { background:var(--gold-light); }
+.add-btn.added { background: #2ecc71; color: #fff; }
+.cart-item { display:flex; justify-content:space-between; align-items:center; padding:0.6rem 0; border-bottom:1px solid rgba(255,255,255,0.08); color:rgba(255,255,255,0.85); font-size:0.95rem; gap:1rem; }
+.cart-item-name { flex:1; }
+.remove-btn { background:none; border:none; color:rgba(255,100,100,0.7); cursor:pointer; font-size:1rem; padding:0.2rem 0.4rem; }
+.remove-btn:hover { color:#ff4444; }
+</style>
+
+<script>
+const DRINKS = [
+  // CHAMPAGNE
+  {name:"Moet Brut", cat:"champagne"},
+  {name:"Moet Nectar Imperial", cat:"champagne"},
+  {name:"Moet Rose Imperial", cat:"champagne"},
+  {name:"Moet Nectar Rose", cat:"champagne"},
+  {name:"Moet Ice Imperial", cat:"champagne"},
+  {name:"Moet Ice Imperial Rose", cat:"champagne"},
+  {name:"Veuve Clicquot Brut", cat:"champagne"},
+  {name:"Veuve Clicquot Rich", cat:"champagne"},
+  {name:"Veuve Clicquot Rich Rose", cat:"champagne"},
+  {name:"Veuve Clicquot Rose", cat:"champagne"},
+  {name:"Laurent Perrier", cat:"champagne"},
+  {name:"Laurent Perrier Rose", cat:"champagne"},
+  {name:"Taittinger", cat:"champagne"},
+  {name:"Dom Perignon Brut", cat:"champagne"},
+  {name:"Dom Perignon Rose", cat:"champagne"},
+  {name:"Ace of Spade Gold", cat:"champagne"},
+  {name:"Ace of Spade Silver", cat:"champagne"},
+  {name:"Ace of Spade Rose", cat:"champagne"},
+  {name:"Belaire Fantom Rose", cat:"champagne"},
+  {name:"Belaire Luxe", cat:"champagne"},
+  {name:"Belaire Bleu", cat:"champagne"},
+  {name:"Belaire Rose", cat:"champagne"},
+  {name:"Belaire Gold", cat:"champagne"},
+  {name:"Canard Duchene", cat:"champagne"},
+  {name:"Duval Leroy", cat:"champagne"},
+  {name:"Monopoly", cat:"champagne"},
+  {name:"Lanson Brut", cat:"champagne"},
+  {name:"Lanson Rose", cat:"champagne"},
+  {name:"Nicolas Feuillatte", cat:"champagne"},
+  // WHISKEY
+  {name:"Glenfiddich 26 Years", cat:"whiskey"},
+  {name:"Glenfiddich 23 Years", cat:"whiskey"},
+  {name:"Glenfiddich 21 Years", cat:"whiskey"},
+  {name:"Glenfiddich 18 Years", cat:"whiskey"},
+  {name:"Glenfiddich 15 Years", cat:"whiskey"},
+  {name:"Glenfiddich 12 Years", cat:"whiskey"},
+  {name:"Glenfiddich Select Cask", cat:"whiskey"},
+  {name:"Macallan 12 Years", cat:"whiskey"},
+  {name:"Macallan 15 Years", cat:"whiskey"},
+  {name:"Macallan 18 Years", cat:"whiskey"},
+  {name:"Macallan Harmony", cat:"whiskey"},
+  {name:"Bushmills", cat:"whiskey"},
+  {name:"Johnnie Walker Blue Label", cat:"whiskey"},
+  {name:"Johnnie Walker Black Label", cat:"whiskey"},
+  {name:"Johnnie Walker Red Label", cat:"whiskey"},
+  {name:"Johnnie Walker Gold Label", cat:"whiskey"},
+  {name:"Johnnie Walker Gold Label 70cl", cat:"whiskey"},
+  {name:"Johnnie Walker Double Black", cat:"whiskey"},
+  {name:"Johnnie Walker 18 Years", cat:"whiskey"},
+  {name:"Johnnie Walker Island Green", cat:"whiskey"},
+  {name:"Chivas Regal 18 Years", cat:"whiskey"},
+  {name:"Chivas Extra", cat:"whiskey"},
+  {name:"Chivas Regal 12 Years", cat:"whiskey"},
+  {name:"Chivas Regal GLS Pack 70cl", cat:"whiskey"},
+  {name:"Jack Daniels Single Barrel", cat:"whiskey"},
+  {name:"Jack Daniels", cat:"whiskey"},
+  {name:"Jack Daniels Honey", cat:"whiskey"},
+  {name:"Jack Daniels Fire", cat:"whiskey"},
+  {name:"Jack Daniels Apple", cat:"whiskey"},
+  {name:"Gentleman Jack", cat:"whiskey"},
+  {name:"Ballantines 12 Years", cat:"whiskey"},
+  {name:"Aberfeldy 12 Years", cat:"whiskey"},
+  {name:"The Glenlivet Founders Reserve", cat:"whiskey"},
+  {name:"The Glenlivet 15 Years", cat:"whiskey"},
+  {name:"The Glenlivet 18 Years 70cl", cat:"whiskey"},
+  {name:"Singleton 12 Years", cat:"whiskey"},
+  {name:"Singleton 15 Years", cat:"whiskey"},
+  {name:"Monkey Shoulder", cat:"whiskey"},
+  {name:"Jameson 1 Litre", cat:"whiskey"},
+  {name:"Jameson 70cl", cat:"whiskey"},
+  {name:"Jameson Black Barrel", cat:"whiskey"},
+  {name:"Black and White", cat:"whiskey"},
+  {name:"Explorers Club Collection", cat:"whiskey"},
+  {name:"Select Cask", cat:"whiskey"},
+  {name:"Glenmorangie 10 Years", cat:"whiskey"},
+  {name:"Clan MacGregor", cat:"whiskey"},
+  {name:"Imperial Blue Swing", cat:"whiskey"},
+  {name:"Tullamore Dew", cat:"whiskey"},
+  {name:"Grants", cat:"whiskey"},
+  // COGNAC
+  {name:"Hennessy XO 1 Litre", cat:"cognac"},
+  {name:"Hennessy XO 70cl", cat:"cognac"},
+  {name:"Hennessy James", cat:"cognac"},
+  {name:"Hennessy VSOP", cat:"cognac"},
+  {name:"Hennessy VS", cat:"cognac"},
+  {name:"Remy Martin 1738", cat:"cognac"},
+  {name:"Remy Martin Club", cat:"cognac"},
+  {name:"Remy Martin VSOP", cat:"cognac"},
+  {name:"Frapin XO", cat:"cognac"},
+  {name:"Camus Extra", cat:"cognac"},
+  {name:"Camus XO", cat:"cognac"},
+  {name:"Camus VSOP", cat:"cognac"},
+  {name:"Courvoisier VSOP", cat:"cognac"},
+  {name:"Courvoisier VS", cat:"cognac"},
+  {name:"Martell Blue Swift", cat:"cognac"},
+  {name:"Martell VSOP", cat:"cognac"},
+  {name:"Martell VS 70cl", cat:"cognac"},
+  {name:"St-Remy Signature", cat:"cognac"},
+  {name:"St-Remy VSOP", cat:"cognac"},
+  {name:"St-Remy VS", cat:"cognac"},
+];
+
+let cart = [];
+let currentCat = 'all';
+let cardQty = {};
+let cardType = {};
+
+DRINKS.forEach((_,i) => { cardQty[i] = 1; cardType[i] = 'single'; });
+
+function filterCat(cat) {
+  currentCat = cat;
+  document.querySelectorAll('.cat-tab').forEach(b => b.classList.remove('active-tab'));
+  event.target.classList.add('active-tab');
+  renderDrinks();
+}
+
+function renderDrinks() {
+  const search = document.getElementById('drinkSearch').value.toLowerCase();
+  const grid = document.getElementById('drinkGrid');
+  grid.innerHTML = '';
+  DRINKS.forEach((d, i) => {
+    if (currentCat !== 'all' && d.cat !== currentCat) return;
+    if (search && !d.name.toLowerCase().includes(search)) return;
+    const inCart = cart.find(c => c.idx === i);
+    grid.innerHTML += `
+      <div class="drink-card">
+        <div class="drink-name">${d.name}</div>
+        <div class="type-toggle">
+          <button class="type-btn ${cardType[i]==='single'?'selected':''}" onclick="setType(${i},'single')">Single</button>
+          <button class="type-btn ${cardType[i]==='carton'?'selected':''}" onclick="setType(${i},'carton')">Carton</button>
+        </div>
+        <div class="qty-row">
+          <button class="qty-btn" onclick="changeQty(${i},-1)">−</button>
+          <span class="qty-num" id="qty-${i}">${cardQty[i]}</span>
+          <button class="qty-btn" onclick="changeQty(${i},1)">+</button>
+          <span style="color:rgba(255,255,255,0.45); font-size:0.8rem; margin-left:0.3rem;">${cardType[i]==='carton'?'carton(s)':'bottle(s)'}</span>
+        </div>
+        <button class="add-btn ${inCart?'added':''}" id="addbtn-${i}" onclick="addToCart(${i})">${inCart?'✓ Added':'Add to Cart'}</button>
+      </div>`;
+  });
+}
+
+function setType(i, type) {
+  cardType[i] = type;
+  renderDrinks();
+}
+
+function changeQty(i, delta) {
+  cardQty[i] = Math.max(1, (cardQty[i]||1) + delta);
+  const el = document.getElementById('qty-'+i);
+  if (el) el.textContent = cardQty[i];
+  // update cart if already added
+  const ci = cart.findIndex(c => c.idx === i);
+  if (ci !== -1) { cart[ci].qty = cardQty[i]; cart[ci].type = cardType[i]; renderCart(); }
+}
+
+function addToCart(i) {
+  const existing = cart.findIndex(c => c.idx === i);
+  if (existing !== -1) {
+    cart[existing].qty = cardQty[i];
+    cart[existing].type = cardType[i];
+  } else {
+    cart.push({ idx: i, name: DRINKS[i].name, qty: cardQty[i], type: cardType[i] });
+  }
+  renderDrinks();
+  renderCart();
+}
+
+function removeFromCart(i) {
+  cart = cart.filter(c => c.idx !== i);
+  renderDrinks();
+  renderCart();
+}
+
+function renderCart() {
+  const summary = document.getElementById('cartSummary');
+  const items = document.getElementById('cartItems');
+  if (cart.length === 0) { summary.style.display = 'none'; return; }
+  summary.style.display = 'block';
+  items.innerHTML = cart.map(c =>
+    `<div class="cart-item">
+      <span class="cart-item-name">${c.name}</span>
+      <span style="color:var(--gold); white-space:nowrap;">${c.qty} ${c.type==='carton'?'carton(s)':'bottle(s)'}</span>
+      <button class="remove-btn" onclick="removeFromCart(${c.idx})">✕</button>
+    </div>`
+  ).join('');
+}
+
+function sendCartToWhatsApp() {
+  if (cart.length === 0) return;
+  let msg = "Hi Big Guys! 🍾 I'd like to place an order:\n\n";
+  cart.forEach(c => { msg += `• ${c.name} — ${c.qty} ${c.type==='carton'?'carton(s)':'bottle(s)'}\n`; });
+  msg += "\nPlease confirm availability and prices. Thank you!";
+  window.open('https://wa.me/233557490950?text=' + encodeURIComponent(msg), '_blank');
+}
+
+renderDrinks();
+</script>
+
 <footer style="position:relative; z-index:2; background: rgba(5,1,3,0.72); backdrop-filter:blur(8px);">
   <p>© 2025 <span>Big Guys Wine &amp; Liquor</span> · Ashongman Estate, Accra, Ghana</p>
   <p style="margin-top:0.5rem; font-size:1rem; font-weight:900; letter-spacing:0.12em; color:var(--gold);">Drink Responsibly &nbsp;·&nbsp; <span style="color:#ff4444; font-size:1.1rem;">STRICTLY 18+ ONLY</span></p>
