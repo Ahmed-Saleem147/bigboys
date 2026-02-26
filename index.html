@@ -1120,6 +1120,12 @@
     <h2 class="section-title" style="color:var(--white); text-shadow:0 2px 20px rgba(0,0,0,0.8); margin-bottom:0.5rem;">Build Your Order</h2>
     <p class="section-body" style="color:rgba(255,255,255,0.75); margin-bottom:2.5rem;">Open a category, select your drinks, choose singles or cartons — then send your order.</p>
 
+    <!-- Search Bar -->
+    <input type="text" id="drinkSearch" oninput="onSearch()" placeholder="🔍 Search any drink e.g. Hennessy, Moet, Glenfiddich..." style="width:100%; padding:0.85rem 1.1rem; border-radius:10px; border:1px solid rgba(212,168,67,0.4); background:rgba(255,255,255,0.06); color:#fff; font-family:'Cormorant Garamond',serif; font-size:1rem; margin-bottom:1.5rem; outline:none; transition:0.2s;">
+
+    <!-- Search Results (shown when typing) -->
+    <div id="searchResults" style="display:none; margin-bottom:2rem; background:rgba(255,255,255,0.03); border:1px solid rgba(212,168,67,0.25); border-radius:12px; overflow:hidden;"></div>
+
     <!-- Accordion Categories -->
     <div id="accordion" style="display:flex; flex-direction:column; gap:1rem; margin-bottom:3rem;"></div>
 
@@ -1136,6 +1142,8 @@
 </section>
 
 <style>
+#drinkSearch:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(212,168,67,0.15); }
+#drinkSearch::placeholder { color: rgba(255,255,255,0.3); }
 .accordion-header {
   display:flex; justify-content:space-between; align-items:center;
   padding:1.1rem 1.5rem; border-radius:12px;
@@ -1388,6 +1396,59 @@ function sendCartToWhatsApp() {
   window.open("https://wa.me/233557490950?text=" + encodeURIComponent(msg), "_blank");
 }
 
+function onSearch() {
+  const q = document.getElementById("drinkSearch").value.trim().toLowerCase();
+  const resultsBox = document.getElementById("searchResults");
+  const accordion = document.getElementById("accordion");
+
+  if (!q) {
+    resultsBox.style.display = "none";
+    resultsBox.innerHTML = "";
+    accordion.style.display = "flex";
+    return;
+  }
+
+  const scored = DRINKS.map((d, i) => {
+    const name = d.name.toLowerCase();
+    let score = 0;
+    if (name === q) score = 100;
+    else if (name.startsWith(q)) score = 80;
+    else if (name.includes(q)) score = 60;
+    else {
+      const words = q.split(" ");
+      const matched = words.filter(w => w && name.includes(w)).length;
+      score = (matched / words.length) * 40;
+    }
+    return {d, i, score};
+  }).filter(x => x.score > 0).sort((a,b) => b.score - a.score);
+
+  accordion.style.display = "none";
+
+  if (!scored.length) {
+    resultsBox.style.display = "block";
+    resultsBox.innerHTML = '<div style="padding:1.2rem 1.5rem; color:rgba(255,255,255,0.45); font-style:italic;">No drinks found for "' + q + '"</div>';
+    return;
+  }
+
+  const catLabels = {champagne:"🥂 Champagne", whiskey:"🥃 Whiskey", cognac:"🍶 Cognac"};
+  resultsBox.style.display = "block";
+  resultsBox.innerHTML = scored.map(({d,i}) => `
+    <div class="drink-row">
+      <span style="font-size:0.7rem; color:var(--gold); opacity:0.7; min-width:90px;">${catLabels[d.cat]}</span>
+      <span class="drink-row-name">${d.name}</span>
+      <div class="toggle-wrap">
+        <button class="toggle-btn ${state[i].type==='single'?'active':''}" onclick="setT(${i},'single')">Single</button>
+        <button class="toggle-btn ${state[i].type==='carton'?'active':''}" onclick="setT(${i},'carton')">Carton</button>
+      </div>
+      <div class="qty-ctrl">
+        <button class="qb" onclick="chQty(${i},-1)">−</button>
+        <span class="qn" id="qn-${i}">${state[i].qty}</span>
+        <button class="qb" onclick="chQty(${i},1)">+</button>
+      </div>
+      <button class="add-row-btn ${cart.find(c=>c.i===i)?'added':''}" id="ab-${i}" onclick="addToCart(${i})">${cart.find(c=>c.i===i)?'✓ Added':'Add'}</button>
+    </div>`).join("");
+}
+
 buildAccordion();
 </script>
 
@@ -1578,107 +1639,6 @@ const DRINKS = [
   {name:"Martell Blue Swift", cat:"cognac"},
   {name:"Martell VSOP", cat:"cognac"},
   {name:"Martell VS 70cl", cat:"cognac"},
-  {name:"St-Remy Signature", cat:"cognac"},
-  {name:"St-Remy VSOP", cat:"cognac"},
-  {name:"St-Remy VS", cat:"cognac"},
-];
-
-let cart = [];
-let currentCat = 'all';
-let cardQty = {};
-let cardType = {};
-
-DRINKS.forEach((_,i) => { cardQty[i] = 1; cardType[i] = 'single'; });
-
-function filterCat(cat) {
-  currentCat = cat;
-  document.querySelectorAll('.cat-tab').forEach(b => b.classList.remove('active-tab'));
-  event.target.classList.add('active-tab');
-  renderDrinks();
-}
-
-function renderDrinks() {
-  const search = document.getElementById('drinkSearch').value.toLowerCase();
-  const grid = document.getElementById('drinkGrid');
-  grid.innerHTML = '';
-  DRINKS.forEach((d, i) => {
-    if (currentCat !== 'all' && d.cat !== currentCat) return;
-    if (search && !d.name.toLowerCase().includes(search)) return;
-    const inCart = cart.find(c => c.idx === i);
-    grid.innerHTML += `
-      <div class="drink-card">
-        <div class="drink-name">${d.name}</div>
-        <div class="type-toggle">
-          <button class="type-btn ${cardType[i]==='single'?'selected':''}" onclick="setType(${i},'single')">Single</button>
-          <button class="type-btn ${cardType[i]==='carton'?'selected':''}" onclick="setType(${i},'carton')">Carton</button>
-        </div>
-        <div class="qty-row">
-          <button class="qty-btn" onclick="changeQty(${i},-1)">−</button>
-          <span class="qty-num" id="qty-${i}">${cardQty[i]}</span>
-          <button class="qty-btn" onclick="changeQty(${i},1)">+</button>
-          <span style="color:rgba(255,255,255,0.45); font-size:0.8rem; margin-left:0.3rem;">${cardType[i]==='carton'?'carton(s)':'bottle(s)'}</span>
-        </div>
-        <button class="add-btn ${inCart?'added':''}" id="addbtn-${i}" onclick="addToCart(${i})">${inCart?'✓ Added':'Add to Cart'}</button>
-      </div>`;
-  });
-}
-
-function setType(i, type) {
-  cardType[i] = type;
-  renderDrinks();
-}
-
-function changeQty(i, delta) {
-  cardQty[i] = Math.max(1, (cardQty[i]||1) + delta);
-  const el = document.getElementById('qty-'+i);
-  if (el) el.textContent = cardQty[i];
-  // update cart if already added
-  const ci = cart.findIndex(c => c.idx === i);
-  if (ci !== -1) { cart[ci].qty = cardQty[i]; cart[ci].type = cardType[i]; renderCart(); }
-}
-
-function addToCart(i) {
-  const existing = cart.findIndex(c => c.idx === i);
-  if (existing !== -1) {
-    cart[existing].qty = cardQty[i];
-    cart[existing].type = cardType[i];
-  } else {
-    cart.push({ idx: i, name: DRINKS[i].name, qty: cardQty[i], type: cardType[i] });
-  }
-  renderDrinks();
-  renderCart();
-}
-
-function removeFromCart(i) {
-  cart = cart.filter(c => c.idx !== i);
-  renderDrinks();
-  renderCart();
-}
-
-function renderCart() {
-  const summary = document.getElementById('cartSummary');
-  const items = document.getElementById('cartItems');
-  if (cart.length === 0) { summary.style.display = 'none'; return; }
-  summary.style.display = 'block';
-  items.innerHTML = cart.map(c =>
-    `<div class="cart-item">
-      <span class="cart-item-name">${c.name}</span>
-      <span style="color:var(--gold); white-space:nowrap;">${c.qty} ${c.type==='carton'?'carton(s)':'bottle(s)'}</span>
-      <button class="remove-btn" onclick="removeFromCart(${c.idx})">✕</button>
-    </div>`
-  ).join('');
-}
-
-function sendCartToWhatsApp() {
-  if (cart.length === 0) return;
-  let msg = "Hi Big Guys! 🍾 I'd like to place an order:\n\n";
-  cart.forEach(c => { msg += `• ${c.name} — ${c.qty} ${c.type==='carton'?'carton(s)':'bottle(s)'}\n`; });
-  msg += "\nPlease confirm availability and prices. Thank you!";
-  window.open('https://wa.me/233557490950?text=' + encodeURIComponent(msg), '_blank');
-}
-
-renderDrinks();
-</script>
 
 <footer style="position:relative; z-index:2; background: rgba(5,1,3,0.72); backdrop-filter:blur(8px);">
   <p>© 2025 <span>Big Guys Wine &amp; Liquor</span> · Ashongman Estate, Accra, Ghana</p>
