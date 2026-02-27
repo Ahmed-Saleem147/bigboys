@@ -4,6 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Big Guys Wine & Liquor – Ashongman Estate, Ghana</title>
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-1Y0ZYG72ET"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-1Y0ZYG72ET');
+</script>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Cormorant+Garamond:wght@300;400;600&family=Bebas+Neue&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -883,9 +891,164 @@
   .contact .contact-card a { color: rgba(255,255,255,0.92); }
   .contact .contact-card a:hover { color: var(--gold); }
 
+  /* ── MOBILE FIXES ── */
+  @media (max-width: 768px) {
+
+    /* Fix background-attachment:fixed on mobile (doesn't work on iOS) */
+    .hero,
+    .categories,
+    .order,
+    .payment,
+    .contact-bg {
+      background-attachment: scroll !important;
+    }
+
+    /* Hero */
+    .hero {
+      background-size: cover;
+      background-position: center center;
+      min-height: 100svh;
+      padding: 5rem 1.25rem 3rem;
+    }
+    .hero-title { font-size: 3rem; }
+    .hero-sub { font-size: 0.85rem; letter-spacing: 0.2em; }
+    .hero-desc { font-size: 1rem; }
+    .hero-btns { flex-direction: column; align-items: center; gap: 0.85rem; width: 100%; }
+    .hero-btns .btn { width: 100%; max-width: 320px; text-align: center; justify-content: center; }
+    .logo-circle { width: 130px; height: 130px; margin-bottom: 1.5rem; }
+
+    /* Sections general */
+    .section-title { font-size: 2rem !important; }
+    .section-body { font-size: 1rem !important; }
+
+    /* Categories */
+    .categories { background-position: center; }
+    .drink-grid { grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .drink-card-inner { padding: 1.25rem 1rem; }
+
+    /* Order steps */
+    .steps { flex-direction: column; align-items: center; gap: 1.5rem; }
+    .step { max-width: 280px; }
+
+    /* Payment logos */
+    .payment-logos { grid-template-columns: repeat(3, 1fr); gap: 0.75rem; }
+    .payment-logo-item { padding: 0.75rem; }
+
+    /* Shop / accordion */
+    #shop { padding: 3.5rem 1rem; }
+    #drinkSearch { font-size: 0.9rem; padding: 0.75rem 0.9rem; }
+    .accordion-title { font-size: 1rem; }
+    .drink-row { flex-wrap: wrap; gap: 0.5rem; padding: 0.75rem 1rem; }
+    .drink-row-name { width: 100%; font-size: 0.9rem; margin-bottom: 0.25rem; }
+    .toggle-wrap, .qty-ctrl, .add-row-btn { flex-shrink: 0; }
+
+    /* Cart summary */
+    #cartSummary { padding: 1.25rem; }
+    #cartSummary button { width: 100%; }
+    .cart-item { font-size: 0.85rem; }
+
+    /* Contact */
+    .contact-grid { grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .contact-card { padding: 1.2rem; }
+  }
+
+  @media (max-width: 480px) {
+    .hero-title { font-size: 2.5rem; }
+    .drink-grid { grid-template-columns: 1fr; }
+    .contact-grid { grid-template-columns: 1fr; }
+    .payment-logos { grid-template-columns: repeat(2, 1fr); }
+    .drink-row { padding: 0.65rem 0.85rem; }
+  }
+
 </style>
 </head>
 <body>
+
+<!-- ── AGE GATE ── -->
+<div id="ageGate" style="
+  position:fixed; inset:0; z-index:99999;
+  background: linear-gradient(135deg, #0a0205 0%, #1a0508 50%, #0a0205 100%);
+  display:flex; align-items:center; justify-content:center;
+  padding:1.5rem;
+">
+  <div style="
+    text-align:center; max-width:420px; width:100%;
+    background:rgba(255,255,255,0.04);
+    border:1px solid rgba(212,168,67,0.25);
+    border-radius:20px; padding:3rem 2.5rem;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+  ">
+    <!-- Logo -->
+    <div style="width:90px; height:90px; border-radius:50%; background:#fff; margin:0 auto 1.5rem; display:flex; align-items:center; justify-content:center; overflow:hidden; box-shadow:0 4px 20px rgba(212,168,67,0.3);">
+      <img src="1772086469670_image.png" alt="Big Guys Logo" style="width:80px; height:80px; object-fit:contain;" onerror="this.parentElement.innerHTML='🍷'">
+    </div>
+
+    <div style="color:var(--gold,#D4A843); font-family:'Cormorant Garamond',serif; font-size:0.8rem; letter-spacing:0.25em; text-transform:uppercase; margin-bottom:0.5rem;">Welcome to</div>
+    <h1 style="color:#fff; font-family:'Playfair Display',serif; font-size:2.2rem; font-weight:900; margin-bottom:0.25rem;">Big Guys</h1>
+    <p style="color:rgba(212,168,67,0.8); font-family:'Cormorant Garamond',serif; font-size:0.95rem; letter-spacing:0.15em; margin-bottom:2rem;">WINE & LIQUOR</p>
+
+    <div style="width:40px; height:1px; background:rgba(212,168,67,0.4); margin:0 auto 2rem;"></div>
+
+    <p style="color:rgba(255,255,255,0.85); font-family:'Cormorant Garamond',serif; font-size:1.2rem; margin-bottom:0.5rem;">You must be of legal drinking age</p>
+    <p style="color:rgba(255,255,255,0.85); font-family:'Cormorant Garamond',serif; font-size:1.2rem; margin-bottom:2rem;">to enter this site.</p>
+    <p style="color:rgba(255,255,255,0.6); font-size:1.05rem; font-family:'Cormorant Garamond',serif; margin-bottom:2.5rem;">Are you 18 years or older?</p>
+
+    <div style="display:flex; gap:1rem; justify-content:center;">
+      <button onclick="allowEntry()" style="
+        flex:1; max-width:160px; padding:0.9rem 1rem;
+        background:var(--gold,#D4A843); color:#0d0508;
+        border:none; border-radius:10px;
+        font-family:'Playfair Display',serif; font-weight:700; font-size:1rem;
+        cursor:pointer; transition:0.2s;
+      " onmouseover="this.style.background='#F0C96A'" onmouseout="this.style.background='#D4A843'">
+        ✅ Yes, I am 18+
+      </button>
+      <button onclick="denyEntry()" style="
+        flex:1; max-width:160px; padding:0.9rem 1rem;
+        background:transparent; color:rgba(255,255,255,0.6);
+        border:1px solid rgba(255,255,255,0.2); border-radius:10px;
+        font-family:'Playfair Display',serif; font-size:1rem;
+        cursor:pointer; transition:0.2s;
+      " onmouseover="this.style.borderColor='rgba(255,100,100,0.5)'; this.style.color='rgba(255,120,120,0.9)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.2)'; this.style.color='rgba(255,255,255,0.6)'">
+        ❌ No
+      </button>
+    </div>
+
+    <p style="margin-top:2rem; color:rgba(255,255,255,0.25); font-size:0.75rem; font-family:'Cormorant Garamond',serif;">By entering you accept our terms. Please drink responsibly.</p>
+  </div>
+</div>
+
+<!-- Denied screen (hidden by default) -->
+<div id="deniedScreen" style="
+  display:none; position:fixed; inset:0; z-index:99999;
+  background:#0a0205;
+  align-items:center; justify-content:center;
+  text-align:center; padding:2rem;
+">
+  <div>
+    <div style="font-size:3rem; margin-bottom:1rem;">🔞</div>
+    <h2 style="color:#fff; font-family:'Playfair Display',serif; font-size:1.8rem; margin-bottom:1rem;">Access Denied</h2>
+    <p style="color:rgba(255,255,255,0.55); font-family:'Cormorant Garamond',serif; font-size:1.1rem;">Sorry, you must be 18 or older to access this site.<br>Please come back when you're of legal drinking age.</p>
+  </div>
+</div>
+
+<script>
+  function allowEntry() {
+    document.getElementById('ageGate').style.display = 'none';
+    sessionStorage.setItem('ageVerified', 'yes');
+  }
+  function denyEntry() {
+    document.getElementById('ageGate').style.display = 'none';
+    const d = document.getElementById('deniedScreen');
+    d.style.display = 'flex';
+    // Disable scroll on body
+    document.body.style.overflow = 'hidden';
+  }
+  // Don't show again if already verified in this session
+  if (sessionStorage.getItem('ageVerified') === 'yes') {
+    document.getElementById('ageGate').style.display = 'none';
+  }
+</script>
 <script>
   function closeMobile() {
     document.getElementById('hamburger').classList.remove('open');
@@ -1131,8 +1294,12 @@
 <!-- FOOTER -->
 
 <!-- ── CART SECTION ── -->
-<section id="shop" style="background:#0d0508; padding:5rem 1.5rem;">
-  <div style="max-width:800px; margin:0 auto;">
+<section id="shop" style="position:relative; background-color:#0d0508; background-image: linear-gradient(to bottom, rgba(10,3,6,0.92) 0%, rgba(80,8,18,0.7) 50%, rgba(10,3,6,0.95) 100%), url('https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=1800&q=80&fit=crop'); background-size:cover; background-position:center; padding:5rem 1.5rem;">
+  <div style="max-width:800px; margin:0 auto; position:relative;">
+    <!-- Floating cart badge -->
+    <div id="floatCart" onclick="document.getElementById('cartSummary').scrollIntoView({behavior:'smooth'})" style="display:none; position:absolute; top:0; right:0; background:var(--gold); color:#0d0508; border-radius:50px; padding:0.45rem 1rem; cursor:pointer; font-family:'Playfair Display',serif; font-weight:700; font-size:0.85rem; z-index:10; box-shadow:0 4px 16px rgba(212,168,67,0.4);">
+      🛒 <span id="floatCartCount">0</span> item(s)
+    </div>
     <span class="section-label" style="color:var(--gold);">Browse & Order</span>
     <h2 class="section-title" style="color:var(--white); text-shadow:0 2px 20px rgba(0,0,0,0.8); margin-bottom:0.5rem;">Build Your Order</h2>
     <p class="section-body" style="color:rgba(255,255,255,0.75); margin-bottom:2.5rem;">Open a category, select your drinks, choose singles or cartons — then send your order.</p>
@@ -1376,6 +1543,14 @@ function chQty(i, d) {
   if (ci!==-1) { cart[ci].qty=state[i].qty; renderCart(); }
 }
 
+function updateFloatCart() {
+  const fc = document.getElementById("floatCart");
+  const fc2 = document.getElementById("floatCartCount");
+  if (!cart.length) { fc.style.display="none"; return; }
+  fc.style.display="flex";
+  fc2.textContent = cart.reduce((a,c)=>a+c.qty,0);
+}
+
 function addToCart(i) {
   const ci = cart.findIndex(c=>c.i===i);
   if (ci!==-1) { cart[ci].qty=state[i].qty; cart[ci].type=state[i].type; }
@@ -1383,6 +1558,7 @@ function addToCart(i) {
   const btn = document.getElementById("ab-"+i);
   btn.textContent = "✓ Added"; btn.classList.add("added");
   renderCart();
+  updateFloatCart();
 }
 
 function removeFromCart(i) {
@@ -1390,6 +1566,7 @@ function removeFromCart(i) {
   const btn = document.getElementById("ab-"+i);
   if (btn) { btn.textContent="Add"; btn.classList.remove("added"); }
   renderCart();
+  updateFloatCart();
 }
 
 function renderCart() {
